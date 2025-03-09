@@ -4,11 +4,11 @@ import com.shop28.dto.request.CartItemRequest;
 import com.shop28.dto.request.CartItemUpdateQuantityRequest;
 import com.shop28.dto.response.CartItemResponse;
 import com.shop28.entity.CartItem;
-import com.shop28.entity.ProductVariant;
+import com.shop28.entity.ProductDetail;
 import com.shop28.entity.User;
 import com.shop28.mapper.CartItemMapper;
 import com.shop28.repository.CartItemRepository;
-import com.shop28.repository.ProductVariantRepository;
+import com.shop28.repository.ProductDetailRepository;
 import com.shop28.repository.UserRepository;
 import com.shop28.service.CartItemService;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,7 +24,7 @@ import java.util.List;
 public class CartItemServiceImpl implements CartItemService {
 
     private final CartItemRepository cartItemRepository;
-    private final ProductVariantRepository productVariantRepository;
+    private final ProductDetailRepository productDetailRepository;
     private final UserRepository userRepository;
     private final CartItemMapper cartItemMapper;
 
@@ -42,18 +42,18 @@ public class CartItemServiceImpl implements CartItemService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        ProductVariant productVariant = productVariantRepository.findById(cartItemRequest.getProductVariantId())
-                .orElseThrow(() -> new EntityNotFoundException("Product variant not found"));
+        ProductDetail productDetail = productDetailRepository.findById(cartItemRequest.getProductDetailId())
+                .orElseThrow(() -> new EntityNotFoundException("Product detail not found"));
 
         //kiểm tra xem sản phẩm còn hàng hay không
-        if (productVariant.getStockQuantity() < cartItemRequest.getQuantity())
-            throw new RuntimeException("The product" + productVariant.getProduct().getName() + "is out of stock");
+        if (productDetail.getStockQuantity() < cartItemRequest.getQuantity())
+            throw new RuntimeException("The product" + productDetail.getProduct().getName() + "is out of stock");
 
         CartItem cartItem = CartItem.builder()
                 .user(user)
-                .productVariant(productVariant)
+                .productDetail(productDetail)
                 .quantity(cartItemRequest.getQuantity())
-                .price(productVariant.getPrice() * cartItemRequest.getQuantity())
+                .price(productDetail.getPrice() * cartItemRequest.getQuantity())
                 .build();
 
         cartItem = cartItemRepository.save(cartItem);
@@ -71,15 +71,15 @@ public class CartItemServiceImpl implements CartItemService {
         //xác thực cartitem cần cập nhật này chính là của user này
         if (!cartItem.getUser().getId().equals(userId)) throw new RuntimeException("Cannot be update");
 
-        ProductVariant productVariant = productVariantRepository.findById(cartItem.getProductVariant().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Product variant not found"));
+        ProductDetail productDetail = productDetailRepository.findById(cartItem.getProductDetail().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Product detail not found"));
 
         //kiểm tra xem sản phẩm còn hàng hay không
-        if (productVariant.getStockQuantity() < cartItemRequest.getQuantity())
-            throw new RuntimeException("The product" + productVariant.getProduct().getName() + "is out of stock");
+        if (productDetail.getStockQuantity() < cartItemRequest.getQuantity())
+            throw new RuntimeException("The product" + productDetail.getProduct().getName() + "is out of stock");
 
         cartItem.setQuantity(cartItemRequest.getQuantity());
-        cartItem.setPrice(cartItemRequest.getQuantity() * productVariant.getPrice());
+        cartItem.setPrice(cartItemRequest.getQuantity() * productDetail.getPrice());
 
         cartItem = cartItemRepository.save(cartItem);
         log.info("Updated cart item ID: {} by user ID: {}", cartItem.getId(), userId);

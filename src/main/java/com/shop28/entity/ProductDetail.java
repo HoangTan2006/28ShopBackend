@@ -12,8 +12,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "product_variants")
-public class ProductVariant extends AbstractEntity<Integer> {
+@Table(name = "product_details")
+public class ProductDetail extends AbstractEntity<Integer> {
     @JoinColumn(name = "product_id")
     @ManyToOne
     private Product product;
@@ -38,6 +38,6 @@ public class ProductVariant extends AbstractEntity<Integer> {
     @Column(name = "sold_quantity")
     private Integer soldQuantity;
 
-    @OneToMany(mappedBy = "productVariant", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "productDetail", cascade = CascadeType.ALL)
     private Set<OrderDetail> orderDetails = new HashSet<>();
 }

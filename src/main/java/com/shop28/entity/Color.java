@@ -21,5 +21,5 @@ public class Color extends AbstractEntity<Integer> {
     private String name;
 
     @OneToMany(mappedBy = "color")
-    private Set<ProductVariant> productVariants = new HashSet<>();
+    private Set<ProductDetail> productDetails = new HashSet<>();
 }

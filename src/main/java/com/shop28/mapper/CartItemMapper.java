@@ -9,8 +9,8 @@ public class CartItemMapper {
     public CartItemResponse toDTO(CartItem cartItem) {
         return CartItemResponse.builder()
                 .id(cartItem.getId())
-                .productVariantId(cartItem.getProductVariant().getId())
-                .name(cartItem.getProductVariant().getProduct().getName())
+                .productDetailId(cartItem.getProductDetail().getId())
+                .name(cartItem.getProductDetail().getProduct().getName())
                 .quantity(cartItem.getQuantity())
                 .price(cartItem.getPrice())
                 .build();

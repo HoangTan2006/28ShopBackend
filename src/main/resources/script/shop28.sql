@@ -52,7 +52,7 @@ CREATE TABLE `products` (
   `update_at` datetime
 );
 
-CREATE TABLE `product_variants` (
+CREATE TABLE `product_details` (
   `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `product_id` integer NOT NULL,
   `image_url` varchar(255) NOT NULL,
@@ -110,7 +110,7 @@ CREATE TABLE `orders` (
 CREATE TABLE `order_details` (
   `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `order_id` integer NOT NULL,
-  `product_variant_id` integer NOT NULL,
+  `product_detail_id` integer NOT NULL,
   `quantity` integer NOT NULL,
   `price` integer NOT NULL,
   `status` varchar(50) NOT NULL,
@@ -121,7 +121,7 @@ CREATE TABLE `order_details` (
 CREATE TABLE `cart_items` (
   `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `user_id` integer NOT NULL,
-  `product_variant_id` integer NOT NULL,
+  `product_detail_id` integer NOT NULL,
   `quantity` integer NOT NULL,
   `price` integer NOT NULL,
   `create_at` datetime,
@@ -132,21 +132,21 @@ ALTER TABLE `user_has_role` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`
 
 ALTER TABLE `user_has_role` ADD FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `product_variants` ADD FOREIGN KEY (`size_id`) REFERENCES `sizes` (`id`) ON DELETE CASCADE;
+ALTER TABLE `product_details` ADD FOREIGN KEY (`size_id`) REFERENCES `sizes` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `product_variants` ADD FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
+ALTER TABLE `product_details` ADD FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `cart_items` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `cart_items` ADD FOREIGN KEY (`product_variant_id`) REFERENCES `product_variants` (`id`) ON DELETE CASCADE;
+ALTER TABLE `cart_items` ADD FOREIGN KEY (`product_detail_id`) REFERENCES `product_details` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `orders` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `order_details` ADD FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `order_details` ADD FOREIGN KEY (`product_variant_id`) REFERENCES `product_variants` (`id`) ON DELETE CASCADE;
+ALTER TABLE `order_details` ADD FOREIGN KEY (`product_detail_id`) REFERENCES `product_details` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `product_variants` ADD FOREIGN KEY (`color_id`) REFERENCES `colors` (`id`) ON DELETE CASCADE;
+ALTER TABLE `product_details` ADD FOREIGN KEY (`color_id`) REFERENCES `colors` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `feedbacks` ADD FOREIGN KEY (`order_detail_id`) REFERENCES `order_details` (`id`) ON DELETE CASCADE;
 

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Builder
-public class ProductVariantResponse {
+public class ProductDetailResponse {
     private Integer id;
     private String name;
     private String category;

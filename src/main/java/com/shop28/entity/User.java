@@ -52,7 +52,22 @@ public class User extends AbstractEntity<Integer> implements CustomUserDetails {
     }
 
     @Override
+    public boolean isAccountNonExpired() {
+        return CustomUserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
     public boolean isAccountNonLocked() {
         return !isLock;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return CustomUserDetails.super.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return CustomUserDetails.super.isEnabled();
     }
 }

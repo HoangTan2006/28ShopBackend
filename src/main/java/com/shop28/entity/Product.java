@@ -34,5 +34,5 @@ public class Product extends AbstractEntity<Integer> {
     private Integer price;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private Set<ProductVariant> productVariants = new HashSet<>();
+    private Set<ProductDetail> productDetails = new HashSet<>();
 }

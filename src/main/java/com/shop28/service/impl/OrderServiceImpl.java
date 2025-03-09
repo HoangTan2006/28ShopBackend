@@ -24,7 +24,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
-    private final ProductVariantRepository productVariantRepository;
+    private final ProductDetailRepository productDetailRepository;
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
     private final CartItemRepository cartItemRepository;
@@ -82,16 +82,16 @@ public class OrderServiceImpl implements OrderService {
 
         List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
 
-        List<Integer> productVariantsId = cartItems.stream().map(cartItem ->
-                cartItem.getProductVariant().getId()).toList();
+        List<Integer> productDetailsId = cartItems.stream().map(cartItem ->
+                cartItem.getProductDetail().getId()).toList();
 
         Map<Integer, Integer> cart = new HashMap<>();
 
         cartItems.forEach(cartItem ->
-                cart.put(cartItem.getProductVariant().getId(), cartItem.getQuantity()));
+                cart.put(cartItem.getProductDetail().getId(), cartItem.getQuantity()));
 
 
-        List<ProductVariant> productVariants = productVariantRepository.findAllById(productVariantsId);
+        List<ProductDetail> productDetails = productDetailRepository.findAllById(productDetailsId);
         Set<OrderDetail> orderDetails = new HashSet<>();
 
         StringJoiner title = new StringJoiner(", ");
@@ -100,28 +100,28 @@ public class OrderServiceImpl implements OrderService {
         /*Thực hiện lặp qua danh sách sản phẩm dựa trên giỏ hàng hiện tại:
           Kiểm tra và cập nhật số lượng trong kho nếu sản phẩm còn đủ số lượng
           Tính số tiền cần thanh toán của order, nối chuỗi title bằng tên các sản phẩm*/
-        for (ProductVariant productVariant : productVariants) {
+        for (ProductDetail productDetail : productDetails) {
 
-            Integer stock = productVariant.getStockQuantity();
-            Integer quantity = cart.get(productVariant.getId());
+            Integer stock = productDetail.getStockQuantity();
+            Integer quantity = cart.get(productDetail.getId());
 
             if (stock >= quantity) {
-                productVariant.setStockQuantity(stock - quantity);
+                productDetail.setStockQuantity(stock - quantity);
 
-                title.add(productVariant.getProduct().getName());
+                title.add(productDetail.getProduct().getName());
 
-                totalPrice += productVariant.getPrice() * quantity;
+                totalPrice += productDetail.getPrice() * quantity;
 
                 orderDetails.add(OrderDetail.builder()
                                 .order(order)
-                                .productVariant(productVariant)
+                                .productDetail(productDetail)
                                 .quantity(quantity)
-                                .price(productVariant.getPrice() * quantity)
+                                .price(productDetail.getPrice() * quantity)
                                 .status(TypeStatus.PENDING.name())
                         .build());
             } else {
-                log.error("The product {} is out of stock", productVariant.getId());
-                throw new RuntimeException("The product" + productVariant.getProduct().getName() + "is out of stock");
+                log.error("The product {} is out of stock", productDetail.getId());
+                throw new RuntimeException("The product" + productDetail.getProduct().getName() + "is out of stock");
             }
         }
 
@@ -130,7 +130,7 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalPrice(totalPrice);
         order.setOrderDetails(orderDetails);
 
-        productVariantRepository.saveAll(productVariants);
+        productDetailRepository.saveAll(productDetails);
         cartItemRepository.deleteAll(cartItems);
         order = orderRepository.save(order);
         log.info("Created order ID: {} by user ID: {}", order.getId(), user.getId());

@@ -15,9 +15,9 @@ public class OrderDetail extends AbstractEntity<Integer> {
     @ManyToOne
     private Order order;
 
-    @JoinColumn(name = "product_variant_id")
+    @JoinColumn(name = "product_detail_id")
     @ManyToOne
-    private ProductVariant productVariant;
+    private ProductDetail productDetail;
 
     @Column(name = "quantity")
     private Integer quantity;

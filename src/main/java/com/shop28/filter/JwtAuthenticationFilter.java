@@ -1,4 +1,4 @@
-package com.shop28.configuration;
+package com.shop28.filter;
 
 import com.shop28.service.JwtService;
 import com.shop28.util.TypeToken;
@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("---------------------------JWT_AUTHENTICATION_REQUEST---------------------------------------");
+        log.info("---------------------------JWT_AUTHENTICATION_FILTER---------------------------------------");
 
         String authorization = request.getHeader("Authorization");
 

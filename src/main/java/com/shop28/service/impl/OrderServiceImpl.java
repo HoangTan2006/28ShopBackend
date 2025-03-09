@@ -113,7 +113,6 @@ public class OrderServiceImpl implements OrderService {
             else throw new RuntimeException("The product" + productVariant.getProduct().getName() + "is out of stock");
         }
 
-
         order.setTitle(title.toString());
         order.setTotalPrice(totalPrice);
         order.setOrderDetails(orderDetails);

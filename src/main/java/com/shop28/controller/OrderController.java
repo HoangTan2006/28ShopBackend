@@ -10,6 +10,7 @@ import com.shop28.entity.Order;
 import com.shop28.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.Authentication;
@@ -27,22 +28,24 @@ public class OrderController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/list")
-    public ResponseData<List<OrderResponse>> getOrders(
+    public ResponseEntity<ResponseData<List<OrderResponse>>> getOrders(
             @RequestParam(value = "pageNumber", defaultValue = "0") Integer pageNumber,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
 
         List<OrderResponse> orders = orderService.getOrders(pageNumber, pageSize);
 
-        return ResponseData.<List<OrderResponse>>builder()
+        ResponseData<List<OrderResponse>> responseData = ResponseData.<List<OrderResponse>>builder()
                 .status(HttpStatus.OK.value())
                 .message("Success")
                 .data(orders)
                 .build();
+
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping
-    public ResponseData<List<OrderResponse>> getOrdersByUserId(
+    public ResponseEntity<ResponseData<List<OrderResponse>>> getOrdersByUserId(
             Authentication authentication,
             @RequestParam(value = "pageNumber", defaultValue = "0") Integer pageNumber,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
@@ -51,16 +54,18 @@ public class OrderController {
 
         List<OrderResponse> orders = orderService.getOrdersByUserId(userDetails.getId(), pageNumber, pageSize);
 
-        return ResponseData.<List<OrderResponse>>builder()
+        ResponseData<List<OrderResponse>> responseData = ResponseData.<List<OrderResponse>>builder()
                 .status(HttpStatus.OK.value())
                 .message("Success")
                 .data(orders)
                 .build();
+
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping
-    public ResponseData<OrderResponse> createOrder(
+    public ResponseEntity<ResponseData<OrderResponse>> createOrder(
             Authentication authentication,
             @RequestBody AddressRequest addressRequest) {
 
@@ -68,26 +73,30 @@ public class OrderController {
 
         OrderResponse order = orderService.createOrder(userDetails.getId(), addressRequest);
 
-        return ResponseData.<OrderResponse>builder()
+        ResponseData<OrderResponse> responseData = ResponseData.<OrderResponse>builder()
                 .status(HttpStatus.CREATED.value())
                 .message("Success")
                 .data(order)
                 .build();
+
+        return new ResponseEntity<>(responseData, HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}")
-    public ResponseData<OrderResponse> updateStatusOrder(
+    public ResponseEntity<ResponseData<OrderResponse>> updateStatusOrder(
             @PathVariable("id") Integer id,
             @RequestBody OrderStatusUpdateRequest orderStatusUpdateRequest) {
 
         OrderResponse order = orderService.updateStatusOder(id, orderStatusUpdateRequest);
 
-        return ResponseData.<OrderResponse>builder()
+        ResponseData<OrderResponse> responseData =  ResponseData.<OrderResponse>builder()
                 .status(HttpStatus.OK.value())
                 .message("Success")
                 .data(order)
                 .build();
+
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
 }

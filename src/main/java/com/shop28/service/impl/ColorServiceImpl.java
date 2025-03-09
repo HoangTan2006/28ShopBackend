@@ -6,10 +6,12 @@ import com.shop28.entity.Color;
 import com.shop28.repository.ColorRepository;
 import com.shop28.service.ColorService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ColorServiceImpl implements ColorService {
@@ -34,6 +36,7 @@ public class ColorServiceImpl implements ColorService {
                 .build();
 
         color = colorRepository.save(color);
+        log.info("Created color \" {} \" by Admin", color.getName());
 
         return ColorResponse.builder()
                 .id(color.getId())

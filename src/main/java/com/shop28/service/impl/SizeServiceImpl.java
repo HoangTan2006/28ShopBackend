@@ -19,6 +19,7 @@ public class SizeServiceImpl implements SizeService {
     @Override
     public List<SizeResponse> getSizes() {
         return sizeRepository.findAll().stream().map(size -> SizeResponse.builder()
+                .id(size.getId())
                 .name(size.getName())
                 .build()).toList();
     }

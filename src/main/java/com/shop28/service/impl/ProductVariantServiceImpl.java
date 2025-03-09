@@ -14,12 +14,14 @@ import com.shop28.repository.SizeRepository;
 import com.shop28.service.ProductVariantService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductVariantServiceImpl implements ProductVariantService {
@@ -62,6 +64,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                 .build();
 
         productVariant = productVariantRepository.save(productVariant);
+        log.info("Created product variant ID: {}", productVariant.getId());
 
         return productVariantMapper.toDTO(productVariant);
     }
@@ -84,6 +87,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         productVariant.setPrice(productVariantRequest.getPrice());
 
         productVariant = productVariantRepository.save(productVariant);
+        log.info("Updated product variant ID: {}", productVariant.getId());
 
         return productVariantMapper.toDTO(productVariant);
     }

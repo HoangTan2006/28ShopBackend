@@ -43,11 +43,11 @@ public class CartItemServiceImpl implements CartItemService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         ProductVariant productVariant = productVariantRepository.findById(cartItemRequest.getProductVariantId())
-                .orElseThrow(() -> new EntityNotFoundException("ProductVariant not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Product variant not found"));
 
+        //kiểm tra xem sản phẩm còn hàng hay không
         if (productVariant.getStockQuantity() < cartItemRequest.getQuantity())
             throw new RuntimeException("The product" + productVariant.getProduct().getName() + "is out of stock");
-        //kiểm tra xem sản phẩm còn hàng hay không
 
         CartItem cartItem = CartItem.builder()
                 .user(user)
@@ -57,7 +57,7 @@ public class CartItemServiceImpl implements CartItemService {
                 .build();
 
         cartItem = cartItemRepository.save(cartItem);
-        log.info("Created cartItemId {} by userId {}", cartItem.getId(), userId);
+        log.info("Created cart item ID: {} by user ID: {}", cartItem.getId(), userId);
 
         return cartItemMapper.toDTO(cartItem);
     }
@@ -66,23 +66,23 @@ public class CartItemServiceImpl implements CartItemService {
     public CartItemResponse updateCartItem(Integer userId, Integer id, CartItemUpdateQuantityRequest cartItemRequest) {
 
         CartItem cartItem = cartItemRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("CartItem not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Cart item not found"));
 
-        if (!cartItem.getUser().getId().equals(userId)) throw new RuntimeException("Cannot be update");
         //xác thực cartitem cần cập nhật này chính là của user này
+        if (!cartItem.getUser().getId().equals(userId)) throw new RuntimeException("Cannot be update");
 
         ProductVariant productVariant = productVariantRepository.findById(cartItem.getProductVariant().getId())
-                .orElseThrow(() -> new EntityNotFoundException("ProductVariant not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Product variant not found"));
 
+        //kiểm tra xem sản phẩm còn hàng hay không
         if (productVariant.getStockQuantity() < cartItemRequest.getQuantity())
             throw new RuntimeException("The product" + productVariant.getProduct().getName() + "is out of stock");
-        //kiểm tra xem sản phẩm còn hàng hay không
 
         cartItem.setQuantity(cartItemRequest.getQuantity());
         cartItem.setPrice(cartItemRequest.getQuantity() * productVariant.getPrice());
 
         cartItem = cartItemRepository.save(cartItem);
-        log.info("Updated cartItemId {} by userId {}", cartItem.getId(), userId);
+        log.info("Updated cart item ID: {} by user ID: {}", cartItem.getId(), userId);
 
         return cartItemMapper.toDTO(cartItem);
     }
@@ -92,10 +92,10 @@ public class CartItemServiceImpl implements CartItemService {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new EntityNotFoundException("Cart item not found"));
 
-        if (!cartItem.getUser().getId().equals(userId)) throw new RuntimeException("Cannot be deleted");
         //xác thực cartitem cần xóa là của user này
+        if (!cartItem.getUser().getId().equals(userId)) throw new RuntimeException("Cannot be deleted");
 
         cartItemRepository.deleteById(cartItemId);
-        log.info("Deleted cart item {}", cartItemId);
+        log.info("Deleted cart item ID: {}", cartItemId);
     }
 }

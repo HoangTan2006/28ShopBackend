@@ -10,12 +10,14 @@ import com.shop28.service.OrderService;
 import com.shop28.util.TypeStatus;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -27,12 +29,14 @@ public class OrderServiceImpl implements OrderService {
     private final AddressMapper addressMapper;
     private final CartItemRepository cartItemRepository;
 
+    //Lấy danh sách order, dành cho admin
     @Override
     public List<OrderResponse> getOrders(Integer pageNumber, Integer pageSize) {
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         List<Order> orders = orderRepository.findAll(pageable).getContent();
+        log.info("Get list order from database");
 
         return orders.stream().map(order -> OrderResponse.builder()
                 .id(order.getId())
@@ -43,12 +47,14 @@ public class OrderServiceImpl implements OrderService {
                 .build()).toList();
     }
 
+    //Lấy danh sách các order của người dùng hiện tại
     @Override
     public List<OrderResponse> getOrdersByUserId(Integer userId, Integer pageNumber, Integer pageSize) {
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         List<Order> orders = orderRepository.findByUserId(userId, pageable);
+        log.info("Get list order by user ID: {}", userId);
 
         return orders.stream().map(order -> OrderResponse.builder()
                 .id(order.getId())
@@ -67,6 +73,7 @@ public class OrderServiceImpl implements OrderService {
 
         Address address = addressRepository.save(addressMapper.toEntity(addressRequest));
 
+        //Tạo order
         Order order = Order.builder()
                 .user(user)
                 .status(TypeStatus.PENDING.name())
@@ -90,6 +97,9 @@ public class OrderServiceImpl implements OrderService {
         StringJoiner title = new StringJoiner(", ");
         int totalPrice = 0;
 
+        /*Thực hiện lặp qua danh sách sản phẩm dựa trên giỏ hàng hiện tại:
+          Kiểm tra và cập nhật số lượng trong kho nếu sản phẩm còn đủ số lượng
+          Tính số tiền cần thanh toán của order, nối chuỗi title bằng tên các sản phẩm*/
         for (ProductVariant productVariant : productVariants) {
 
             Integer stock = productVariant.getStockQuantity();
@@ -109,10 +119,13 @@ public class OrderServiceImpl implements OrderService {
                                 .price(productVariant.getPrice() * quantity)
                                 .status(TypeStatus.PENDING.name())
                         .build());
+            } else {
+                log.error("The product {} is out of stock", productVariant.getId());
+                throw new RuntimeException("The product" + productVariant.getProduct().getName() + "is out of stock");
             }
-            else throw new RuntimeException("The product" + productVariant.getProduct().getName() + "is out of stock");
         }
 
+        //Cập nhật title, totalPrice, orderDetail
         order.setTitle(title.toString());
         order.setTotalPrice(totalPrice);
         order.setOrderDetails(orderDetails);
@@ -120,6 +133,7 @@ public class OrderServiceImpl implements OrderService {
         productVariantRepository.saveAll(productVariants);
         cartItemRepository.deleteAll(cartItems);
         order = orderRepository.save(order);
+        log.info("Created order ID: {} by user ID: {}", order.getId(), user.getId());
 
         return OrderResponse.builder()
                 .id(order.getId())
@@ -138,6 +152,7 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(orderStatusUpdateRequest.getStatus().toUpperCase());
 
         order = orderRepository.save(order);
+        log.info("Order ID: {} status updated to {}", order.getId(), order.getStatus());
 
         return OrderResponse.builder()
                 .id(order.getId())

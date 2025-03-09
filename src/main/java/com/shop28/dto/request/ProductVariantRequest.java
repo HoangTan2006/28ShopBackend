@@ -4,7 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class ProductVariantRequest {
-    private String description;
     private String imageUrl;
     private String color;
     private String size;

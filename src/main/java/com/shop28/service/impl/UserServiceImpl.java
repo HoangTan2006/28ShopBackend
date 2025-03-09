@@ -14,6 +14,7 @@ import com.shop28.util.TypeUser;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -72,6 +74,7 @@ public class UserServiceImpl implements UserService {
         user.setRoles(Set.of(userHasRole));
 
         user = userRepository.save(user);
+        log.info("Created user ID: {}", user.getId());
 
         return userMapper.toDTO(user);
     }

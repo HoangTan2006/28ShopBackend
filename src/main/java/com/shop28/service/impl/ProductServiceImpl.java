@@ -10,12 +10,14 @@ import com.shop28.repository.ProductRepository;
 import com.shop28.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
@@ -28,6 +30,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponse> getProducts(Integer pageNumber, Integer size) {
         Pageable pageable = PageRequest.of(pageNumber, size);
         List<Product> products = productRepository.findAll(pageable).getContent();
+        log.info("Get list product from database");
 
         return products.stream().map(productMapper::toDTO).toList();
     }
@@ -48,6 +51,7 @@ public class ProductServiceImpl implements ProductService {
                 .build();
 
         product = productRepository.save(product);
+        log.info("Created product ID: {}", product.getId());
 
         return productMapper.toDTO(product);
     }
@@ -62,6 +66,7 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(productRequest.getPrice());
 
         product = productRepository.save(product);
+        log.info("Updated product ID: {}", product.getId());
 
         return productMapper.toDTO(product);
     }

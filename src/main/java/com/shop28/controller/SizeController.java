@@ -7,6 +7,7 @@ import com.shop28.entity.Size;
 import com.shop28.service.SizeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
@@ -23,25 +24,29 @@ public class SizeController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseData<List<SizeResponse>> getSizes() {
+    public ResponseEntity<ResponseData<List<SizeResponse>>> getSizes() {
         List<SizeResponse> sizes = sizeService.getSizes();
 
-        return ResponseData.<List<SizeResponse>>builder()
+        ResponseData<List<SizeResponse>> responseData = ResponseData.<List<SizeResponse>>builder()
                 .status(HttpStatus.OK.value())
                 .message("Success")
                 .data(sizes)
                 .build();
+
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseData<Integer> sizeCreate(@RequestBody SizeRequest sizeRequest) {
+    public ResponseEntity<ResponseData<SizeResponse>> createSize(@RequestBody SizeRequest sizeRequest) {
         SizeResponse size = sizeService.createSize(sizeRequest);
 
-        return ResponseData.<Integer>builder()
-                .status(HttpStatus.OK.value())
+        ResponseData<SizeResponse> responseData = ResponseData.<SizeResponse>builder()
+                .status(HttpStatus.CREATED.value())
                 .message("Success")
-                .data(size.getId())
+                .data(size)
                 .build();
+
+        return new ResponseEntity<>(responseData, HttpStatus.CREATED);
     }
 }

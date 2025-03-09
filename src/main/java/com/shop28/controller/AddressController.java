@@ -6,6 +6,7 @@ import com.shop28.dto.response.ResponseData;
 import com.shop28.service.AddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
@@ -20,29 +21,33 @@ public class AddressController {
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping
-    public ResponseData<Integer> createAddress(@RequestBody AddressRequest addressRequest) {
+    public ResponseEntity<ResponseData<AddressResponse>> createAddress(@RequestBody AddressRequest addressRequest) {
 
         AddressResponse addressResponse = addressService.createAddress(addressRequest);
 
-        return ResponseData.<Integer>builder()
+        ResponseData<AddressResponse> responseData = ResponseData.<AddressResponse>builder()
                 .status(HttpStatus.CREATED.value())
                 .message("Success")
-                .data(addressResponse.getId())
+                .data(addressResponse)
                 .build();
+
+        return new ResponseEntity<>(responseData, HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('USER')")
     @PatchMapping("/{id}")
-    public ResponseData<Integer> updateAddress(
+    public ResponseEntity<ResponseData<AddressResponse>> updateAddress(
             @PathVariable("id") Integer id,
             @RequestBody AddressRequest addressRequest) {
 
         AddressResponse address = addressService.updateAddress(id, addressRequest);
 
-        return ResponseData.<Integer>builder()
+        ResponseData<AddressResponse> responseData = ResponseData.<AddressResponse>builder()
                 .status(HttpStatus.OK.value())
                 .message("Success")
-                .data(address.getId())
+                .data(address)
                 .build();
+
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 }

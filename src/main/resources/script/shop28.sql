@@ -128,6 +128,15 @@ CREATE TABLE `cart_items` (
   `update_at` datetime
 );
 
+CREATE TABLE `token` (
+  `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `user_id` integer NOT NULL,
+  `access_token` varchar(512) NOT NULL,
+  `refresh_token` varchar(512) NOT NULL,
+  `create_at` datetime,
+  `update_at` datetime
+);
+
 ALTER TABLE `user_has_role` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `user_has_role` ADD FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE;

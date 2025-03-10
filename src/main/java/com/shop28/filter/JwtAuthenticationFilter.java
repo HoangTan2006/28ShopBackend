@@ -1,7 +1,9 @@
 package com.shop28.filter;
 
 import com.shop28.service.JwtService;
+import com.shop28.service.RedisBlacklistService;
 import com.shop28.util.TypeToken;
+import io.jsonwebtoken.JwtException;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,6 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final RedisBlacklistService blacklist;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -41,6 +44,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = authorization.substring(7);
 
+        if (blacklist.isTokenBlacklisted(token)) throw new JwtException("Invalid token");
+
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
             String userName = jwtService.verifyTokenAndExtractUserName(token, TypeToken.ACCESS);
@@ -52,8 +57,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             context.setAuthentication(authentication);
             SecurityContextHolder.setContext(context);
-        }
 
-        filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response);
+        }
     }
 }

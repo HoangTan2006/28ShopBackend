@@ -8,4 +8,6 @@ public interface AuthenticationService {
     AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest);
 
     AccessTokenResponse verifyRefreshToken(String refreshToken);
+
+    void logOut(String token);
 }

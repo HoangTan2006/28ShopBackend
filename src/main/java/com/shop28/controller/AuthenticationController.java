@@ -1,20 +1,18 @@
 package com.shop28.controller;
 
 import com.shop28.dto.request.AuthenticationRequest;
-import com.shop28.dto.request.CartItemRequest;
 import com.shop28.dto.request.RefreshTokenRequest;
 import com.shop28.dto.response.*;
-import com.shop28.entity.CartItem;
+import com.shop28.entity.CustomUserDetails;
 import com.shop28.service.AuthenticationService;
-import com.shop28.service.CartItemService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -48,5 +46,17 @@ public class AuthenticationController {
                 .build();
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+    @PostMapping("/log-out")
+    public ResponseEntity<ResponseData<Void>> logOut(@RequestHeader("Authorization") String authorization) {
+        authenticationService.logOut(authorization);
+
+        ResponseData<Void> responseData = ResponseData.<Void>builder()
+                .status(HttpStatus.NO_CONTENT.value())
+                .message("Success")
+                .build();
+
+        return new ResponseEntity<>(responseData, HttpStatus.NO_CONTENT);
     }
 }

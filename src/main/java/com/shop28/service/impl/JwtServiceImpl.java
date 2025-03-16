@@ -1,19 +1,27 @@
 package com.shop28.service.impl;
 
 import com.shop28.entity.CustomUserDetails;
+import com.shop28.entity.Token;
 import com.shop28.entity.User;
+import com.shop28.repository.TokenRepository;
 import com.shop28.service.JwtService;
 import com.shop28.util.TypeToken;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
+
+    private final TokenRepository tokenRepository;
 
     @Value("${jwt.expire.accessToken}")
     private Long ACCESS_EXPIRATION;
@@ -31,8 +39,10 @@ public class JwtServiceImpl implements JwtService {
     private String ISSUER;
 
     @Override
-    public String generateToken(User user, TypeToken typeToken) {
-        return Jwts.builder()
+    public String generateToken(User user, TypeToken typeToken, String tokenId) {
+
+        String token = Jwts.builder()
+                .id(tokenId)
                 .claim("userId", user.getId())
                 .subject(user.getUsername())
                 .claim("role", getRole(user))
@@ -41,16 +51,24 @@ public class JwtServiceImpl implements JwtService {
                 .expiration(new Date(System.currentTimeMillis() + getExpirationTime(typeToken)))
                 .signWith(getSecretKey(typeToken))
                 .compact();
+
+        //Lưu refresh token vào db
+        if (TypeToken.REFRESH.equals(typeToken)) tokenRepository.save(Token.builder()
+                        .id(tokenId)
+                        .username(user.getUsername())
+                        .refreshToken(token)
+                .build());
+        return token;
     }
 
     @Override
-    public String verifyTokenAndExtractUserName(String token, TypeToken typeToken) {
+    public Claims verifyToken(String token, TypeToken typeToken) {
         return Jwts.parser()
                 .verifyWith(getSecretKey(typeToken))
                 .requireIssuer(ISSUER)
                 .build()
                 .parseClaimsJws(token)
-                .getPayload().getSubject();
+                .getPayload();
     }
 
     private SecretKey getSecretKey(TypeToken typeToken) {

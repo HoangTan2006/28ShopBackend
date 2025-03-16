@@ -3,7 +3,6 @@ package com.shop28.controller;
 import com.shop28.dto.request.AuthenticationRequest;
 import com.shop28.dto.request.RefreshTokenRequest;
 import com.shop28.dto.response.*;
-import com.shop28.entity.CustomUserDetails;
 import com.shop28.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,11 +34,11 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<ResponseData<AccessTokenResponse>> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+    public ResponseEntity<ResponseData<AuthenticationResponse>> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
 
-        AccessTokenResponse accessToken = authenticationService.verifyRefreshToken(refreshTokenRequest.getRefreshToken());
+        AuthenticationResponse accessToken = authenticationService.verifyRefreshToken(refreshTokenRequest.getRefreshToken());
 
-        ResponseData<AccessTokenResponse> responseData = ResponseData.<AccessTokenResponse>builder()
+        ResponseData<AuthenticationResponse> responseData = ResponseData.<AuthenticationResponse>builder()
                 .status(HttpStatus.OK.value())
                 .message("Success")
                 .data(accessToken)
@@ -49,8 +48,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("/log-out")
-    public ResponseEntity<ResponseData<Void>> logOut(@RequestHeader("Authorization") String authorization) {
-        authenticationService.logOut(authorization);
+    public ResponseEntity<ResponseData<Void>> logOut(
+            Authentication authentication,
+            @RequestHeader("Authorization") String accessToken) {
+        authenticationService.logOut(authentication.getDetails().toString(), accessToken);
 
         ResponseData<Void> responseData = ResponseData.<Void>builder()
                 .status(HttpStatus.NO_CONTENT.value())

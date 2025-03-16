@@ -1,7 +1,6 @@
 package com.shop28.service.impl;
 
 import com.shop28.dto.request.AuthenticationRequest;
-import com.shop28.dto.response.AccessTokenResponse;
 import com.shop28.dto.response.AuthenticationResponse;
 import com.shop28.dto.response.UserResponse;
 import com.shop28.entity.Token;
@@ -10,15 +9,19 @@ import com.shop28.mapper.UserMapper;
 import com.shop28.repository.TokenRepository;
 import com.shop28.service.*;
 import com.shop28.util.TypeToken;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
+import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -31,7 +34,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
     private final UserMapper userMapper;
     private final TokenRepository tokenRepository;
-    private final TokenService tokenService;
     private final RedisBlacklistService blacklist;
 
     @Override
@@ -42,17 +44,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         User user = userService.findByUsername(authenticationRequest.getUsername());
 
-        String accessToken = jwtService.generateToken(user, TypeToken.ACCESS);
-        String refreshToken = jwtService.generateToken(user, TypeToken.REFRESH);
-
-        Token token = Token.builder()
-                .userId(user.getId())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-
-        //Lưu token vào database
-        tokenRepository.save(token);
+        String tokenId = UUID.randomUUID().toString();
+        String accessToken = jwtService.generateToken(user, TypeToken.ACCESS, tokenId);
+        String refreshToken = jwtService.generateToken(user, TypeToken.REFRESH, tokenId);
 
         UserResponse userResponse = userMapper.toDTO(user);
         log.info("User ID: {} authenticated", user.getId());
@@ -65,36 +59,36 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public AccessTokenResponse verifyRefreshToken(String refreshToken) {
+    public AuthenticationResponse verifyRefreshToken(String refreshToken) {
+        if (StringUtils.isBlank(refreshToken)) throw new RuntimeException("token must not be blank");
         //Xác thực refresh token
-        String username = jwtService.verifyTokenAndExtractUserName(refreshToken, TypeToken.REFRESH);
+        Claims extractToken = jwtService.verifyToken(refreshToken, TypeToken.REFRESH);
+        String username = extractToken.getSubject();
 
         if (!tokenRepository.existsByRefreshToken(refreshToken)) throw new JwtException("Invalid token");
 
         User user = userService.findByUsername(username);
 
         //tạo access token
-        String accessToken = jwtService.generateToken(user, TypeToken.ACCESS);
-
-        //Xóa access token cũ, cập nhật access token mới
-        Token token = tokenService.updateToken(accessToken, refreshToken);
+        String accessToken = jwtService.generateToken(user, TypeToken.ACCESS, extractToken.getId());
         log.info("User ID: {} verified the refresh token", user.getId());
 
-        return AccessTokenResponse.builder()
-                .accessToken(token.getAccessToken())
+        return AuthenticationResponse.builder()
+                .userResponse(userMapper.toDTO(user))
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
     @Override
     @Transactional
-    public void logOut(String authorization) {
-        String accessToken = authorization.replace("Bearer ", "");
+    public void logOut(String tokenId, String accessToken) {
+        accessToken = accessToken.replace("Bearer ", "");
 
         //Lưu access token vào blacklist
         blacklist.saveTokenToBlacklist(accessToken, "invalid", 60, TimeUnit.MINUTES);
 
         //Xóa access token và refresh token trong database
-        tokenRepository.deleteByAccessToken(accessToken);
-
+        tokenRepository.deleteById(tokenId);
     }
 }

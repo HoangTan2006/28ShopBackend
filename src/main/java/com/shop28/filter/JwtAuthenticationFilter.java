@@ -3,6 +3,7 @@ package com.shop28.filter;
 import com.shop28.service.JwtService;
 import com.shop28.service.RedisBlacklistService;
 import com.shop28.util.TypeToken;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -48,12 +50,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            String userName = jwtService.verifyTokenAndExtractUserName(token, TypeToken.ACCESS);
+            Claims extractToken = jwtService.verifyToken(token, TypeToken.ACCESS);
+            String username = extractToken.getSubject();
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             SecurityContext context = SecurityContextHolder.createEmptyContext();
-            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            authentication.setDetails(extractToken.getId());
 
             context.setAuthentication(authentication);
             SecurityContextHolder.setContext(context);

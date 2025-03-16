@@ -14,6 +14,9 @@ import com.shop28.service.CartItemService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +32,7 @@ public class CartItemServiceImpl implements CartItemService {
     private final CartItemMapper cartItemMapper;
 
     @Override
+    @Cacheable(cacheNames = "cart", key = "#userId")
     public List<CartItemResponse> getCartByUserId(Integer userId) {
 
         List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
@@ -37,6 +41,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "cart", key = "#userId")
     public CartItemResponse createCartItem(Integer userId, CartItemRequest cartItemRequest) {
 
         User user = userRepository.findById(userId)
@@ -63,6 +68,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "cart", key = "#userId")
     public CartItemResponse updateCartItem(Integer userId, Integer id, CartItemUpdateQuantityRequest cartItemRequest) {
 
         CartItem cartItem = cartItemRepository.findById(id)
@@ -88,6 +94,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "cart", key = "#userId")
     public void deleteCartItem(Integer userId, Integer cartItemId) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new EntityNotFoundException("Cart item not found"));

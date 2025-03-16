@@ -129,9 +129,8 @@ CREATE TABLE `cart_items` (
 );
 
 CREATE TABLE `token` (
-  `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `user_id` integer NOT NULL,
-  `access_token` varchar(512) NOT NULL,
+  `id` integer PRIMARY KEY NOT NULL,
+  `user_name` varchar(100) NOT NULL,
   `refresh_token` varchar(512) NOT NULL,
   `create_at` datetime,
   `update_at` datetime

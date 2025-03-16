@@ -11,6 +11,9 @@ import com.shop28.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,8 +30,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
 
     @Override
-    public List<ProductResponse> getProducts(Integer pageNumber, Integer size) {
-        Pageable pageable = PageRequest.of(pageNumber, size);
+    @Cacheable(cacheNames = "products", key = "#pageNumber + '-' + #sizeNumber")
+    public List<ProductResponse> getProducts(Integer pageNumber, Integer sizeNumber) {
+        Pageable pageable = PageRequest.of(pageNumber, sizeNumber);
         List<Product> products = productRepository.findAll(pageable).getContent();
         log.info("Get list product from database");
 
@@ -36,6 +40,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "products", allEntries = true)
     public ProductResponse createProduct(ProductRequest productRequest) {
 
         Category category = categoryRepository.findById(productRequest.getCategoryId())
@@ -57,6 +62,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "products", allEntries = true)
     public ProductResponse updateProduct(Integer id, ProductRequest productRequest) {
         Product product = productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product not found"));
 

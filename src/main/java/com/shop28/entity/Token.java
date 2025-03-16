@@ -1,9 +1,11 @@
 package com.shop28.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.util.Date;
 
 @Setter
 @Getter
@@ -12,13 +14,22 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "token")
-public class Token extends AbstractEntity<Integer> {
-    @Column(name = "user_id")
-    private Integer userId;
+public class Token {
+    @Id
+    @Column(name = "id")
+    private String id;
 
-    @Column(name = "access_token")
-    private String accessToken;
+    @Column(name = "user_name")
+    private String username;
 
     @Column(name = "refresh_token")
     private String refreshToken;
+
+    @Column(name = "create_at")
+    @CreationTimestamp
+    private Date createAt;
+
+    @Column(name = "update_at")
+    @UpdateTimestamp
+    private Date updateAt;
 }

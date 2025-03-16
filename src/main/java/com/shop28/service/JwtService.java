@@ -2,9 +2,10 @@ package com.shop28.service;
 
 import com.shop28.entity.User;
 import com.shop28.util.TypeToken;
+import io.jsonwebtoken.Claims;
 
 public interface JwtService {
-    String generateToken(User user, TypeToken typeToken);
+    String generateToken(User user, TypeToken typeToken, String tokenId);
 
-    String verifyTokenAndExtractUserName(String token, TypeToken typeToken);
+    Claims verifyToken(String token, TypeToken typeToken);
 }

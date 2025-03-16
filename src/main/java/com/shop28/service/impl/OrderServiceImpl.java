@@ -9,6 +9,7 @@ import com.shop28.repository.*;
 import com.shop28.service.OrderService;
 import com.shop28.util.TypeStatus;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -66,6 +67,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public OrderResponse createOrder(Integer userId, AddressRequest addressRequest) {
 
         User user = userRepository.findById(userId)

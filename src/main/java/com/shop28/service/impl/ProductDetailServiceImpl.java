@@ -12,6 +12,7 @@ import com.shop28.repository.ProductRepository;
 import com.shop28.repository.ProductDetailRepository;
 import com.shop28.repository.SizeRepository;
 import com.shop28.service.ProductDetailService;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +53,10 @@ public class ProductDetailServiceImpl implements ProductDetailService {
 
         Size size = sizeRepository.findByName(productDetailRequest.getSize().toUpperCase())
                 .orElseThrow(() -> new EntityNotFoundException("Size not found"));
+
+        //Kiểm tra xem đã tồn tại biến thể này chưa
+        if (productDetailRepository.existsByProductIdAndColorAndSize(productId, color, size))
+            throw new EntityExistsException("Product detail is existed");
 
         ProductDetail productDetail = ProductDetail.builder()
                 .product(product)

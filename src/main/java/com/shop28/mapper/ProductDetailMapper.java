@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ProductDetailMapper {
-    public ProductDetailResponse toDTO(ProductDetail productDetail) {
+    public ProductDetailResponse toProductDetailDTO(ProductDetail productDetail) {
         return ProductDetailResponse.builder()
                 .id(productDetail.getId())
                 .name(productDetail.getProduct().getName())

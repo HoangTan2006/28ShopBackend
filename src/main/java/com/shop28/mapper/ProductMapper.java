@@ -1,13 +1,12 @@
 package com.shop28.mapper;
 
-import com.shop28.dto.request.ProductRequest;
 import com.shop28.dto.response.ProductResponse;
 import com.shop28.entity.Product;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProductMapper {
-    public ProductResponse toDTO(Product product) {
+    public ProductResponse toProductDTO(Product product) {
         return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())

@@ -25,7 +25,7 @@ public class AddressServiceImpl implements AddressService {
 
         address = addressRepository.save(address);
 
-        return addressMapper.toDTO(address);
+        return addressMapper.toAddressDTO(address);
     }
 
     @Override
@@ -43,6 +43,6 @@ public class AddressServiceImpl implements AddressService {
 
         address = addressRepository.save(address);
 
-        return addressMapper.toDTO(address);
+        return addressMapper.toAddressDTO(address);
     }
 }

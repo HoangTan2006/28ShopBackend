@@ -42,7 +42,7 @@ public class OrderServiceImpl implements OrderService {
         return orders.stream().map(order -> OrderResponse.builder()
                 .id(order.getId())
                 .userId(order.getUser().getId())
-                .address(addressMapper.toDTO(order.getAddress()))
+                .address(addressMapper.toAddressDTO(order.getAddress()))
                 .price(order.getTotalPrice())
                 .status(order.getStatus())
                 .build()).toList();
@@ -60,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
         return orders.stream().map(order -> OrderResponse.builder()
                 .id(order.getId())
                 .userId(order.getUser().getId())
-                .address(addressMapper.toDTO(order.getAddress()))
+                .address(addressMapper.toAddressDTO(order.getAddress()))
                 .price(order.getTotalPrice())
                 .status(order.getStatus())
                 .build()).toList();
@@ -135,12 +135,13 @@ public class OrderServiceImpl implements OrderService {
         productDetailRepository.saveAll(productDetails);
         cartItemRepository.deleteAll(cartItems);
         order = orderRepository.save(order);
+        if (true) throw new RuntimeException("test");
         log.info("Created order ID: {} by user ID: {}", order.getId(), user.getId());
 
         return OrderResponse.builder()
                 .id(order.getId())
                 .userId(order.getUser().getId())
-                .address(addressMapper.toDTO(order.getAddress()))
+                .address(addressMapper.toAddressDTO(order.getAddress()))
                 .price(order.getTotalPrice())
                 .status(order.getStatus())
                 .build();
@@ -159,7 +160,7 @@ public class OrderServiceImpl implements OrderService {
         return OrderResponse.builder()
                 .id(order.getId())
                 .userId(order.getUser().getId())
-                .address(addressMapper.toDTO(order.getAddress()))
+                .address(addressMapper.toAddressDTO(order.getAddress()))
                 .price(order.getTotalPrice())
                 .status(order.getStatus())
                 .build();

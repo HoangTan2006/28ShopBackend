@@ -3,7 +3,9 @@ package com.shop28.controller;
 import com.shop28.dto.request.ProductRequest;
 import com.shop28.dto.response.ProductResponse;
 import com.shop28.dto.response.ResponseData;
+import com.shop28.dto.response.UserResponse;
 import com.shop28.service.ProductService;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -21,12 +24,13 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @GetMapping
-    public ResponseEntity<ResponseData<List<ProductResponse>>> getProducts(
+    @GetMapping("/{category}")
+    public ResponseEntity<ResponseData<List<ProductResponse>>> getProductsByCategory(
+            @PathVariable String category,
             @RequestParam(value = "pageNumber", defaultValue = "0") Integer pageNumber,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
 
-        List<ProductResponse> products = productService.getProducts(pageNumber, pageSize);
+        List<ProductResponse> products = productService.getProductsByCategory(category, pageNumber, pageSize);
 
         ResponseData<List<ProductResponse>> responseData = ResponseData.<List<ProductResponse>>builder()
                 .status(HttpStatus.OK.value())

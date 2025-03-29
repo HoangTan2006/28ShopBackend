@@ -7,6 +7,7 @@ import com.shop28.dto.response.UserResponse;
 import com.shop28.entity.CustomUserDetails;
 import com.shop28.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,8 +15,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
@@ -55,7 +58,9 @@ public class UserController {
 
     @PreAuthorize("hasRole('USER')")
     @PatchMapping
-    public ResponseEntity<ResponseData<UserResponse>> updateUser(Authentication authentication, @RequestBody UserUpdateRequest userUpdate) {
+    public ResponseEntity<ResponseData<UserResponse>> updateUser(
+            Authentication authentication,
+            @RequestBody UserUpdateRequest userUpdate) {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 

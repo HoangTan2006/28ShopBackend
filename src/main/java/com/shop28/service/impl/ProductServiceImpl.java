@@ -8,14 +8,12 @@ import com.shop28.mapper.ProductMapper;
 import com.shop28.repository.CategoryRepository;
 import com.shop28.repository.ProductRepository;
 import com.shop28.service.ProductService;
+import com.shop28.util.TypeCategory;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,13 +28,20 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
 
     @Override
-    @Cacheable(cacheNames = "products", key = "#pageNumber + '-' + #sizeNumber")
-    public List<ProductResponse> getProducts(Integer pageNumber, Integer sizeNumber) {
-        Pageable pageable = PageRequest.of(pageNumber, sizeNumber);
-        List<Product> products = productRepository.findAll(pageable).getContent();
-        log.info("Get list product from database");
+    @Cacheable(cacheNames = "products", key = "#pageNumber + '-' + #pageSize + '-' + #category")
+    public List<ProductResponse> getProductsByCategory(String category, Integer pageNumber, Integer pageSize) {
 
-        return products.stream().map(productMapper::toDTO).toList();
+        Integer limit = pageSize;
+        Integer offset =  (pageNumber == 1) ? 0 : (pageNumber - 1) * pageSize;
+        Integer categoryId = TypeCategory.valueOf(category.toUpperCase()).getValue();
+
+        List<Product> products = productRepository.findByCategory(categoryId, limit, offset);
+        return products.stream().map(productMapper::toProductDTO).toList();
+    }
+
+    @Override
+    public List<ProductResponse> searchProducts(String keyword, Integer pageNumber, Integer pageSize) {
+        return List.of();
     }
 
     @Override
@@ -58,7 +63,7 @@ public class ProductServiceImpl implements ProductService {
         product = productRepository.save(product);
         log.info("Created product ID: {}", product.getId());
 
-        return productMapper.toDTO(product);
+        return productMapper.toProductDTO(product);
     }
 
     @Override
@@ -74,6 +79,6 @@ public class ProductServiceImpl implements ProductService {
         product = productRepository.save(product);
         log.info("Updated product ID: {}", product.getId());
 
-        return productMapper.toDTO(product);
+        return productMapper.toProductDTO(product);
     }
 }

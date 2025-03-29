@@ -40,7 +40,7 @@ public class ProductDetailServiceImpl implements ProductDetailService {
 
         List<ProductDetail> productDetails = productDetailRepository.findByProductId(productId, pageable);
 
-        return productDetails.stream().map(productDetailMapper::toDTO).toList();
+        return productDetails.stream().map(productDetailMapper::toProductDetailDTO).toList();
     }
 
     @Override
@@ -71,7 +71,7 @@ public class ProductDetailServiceImpl implements ProductDetailService {
         productDetail = productDetailRepository.save(productDetail);
         log.info("Created product detail ID: {}", productDetail.getId());
 
-        return productDetailMapper.toDTO(productDetail);
+        return productDetailMapper.toProductDetailDTO(productDetail);
     }
 
     @Override
@@ -94,6 +94,6 @@ public class ProductDetailServiceImpl implements ProductDetailService {
         productDetail = productDetailRepository.save(productDetail);
         log.info("Updated product detail ID: {}", productDetail.getId());
 
-        return productDetailMapper.toDTO(productDetail);
+        return productDetailMapper.toProductDetailDTO(productDetail);
     }
 }

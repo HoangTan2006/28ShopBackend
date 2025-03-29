@@ -15,7 +15,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +36,7 @@ public class CartItemServiceImpl implements CartItemService {
 
         List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
 
-        return cartItems.stream().map(cartItemMapper::toDTO).toList();
+        return cartItems.stream().map(cartItemMapper::toCartItemDTO).toList();
     }
 
     @Override
@@ -64,7 +63,7 @@ public class CartItemServiceImpl implements CartItemService {
         cartItem = cartItemRepository.save(cartItem);
         log.info("Created cart item ID: {} by user ID: {}", cartItem.getId(), userId);
 
-        return cartItemMapper.toDTO(cartItem);
+        return cartItemMapper.toCartItemDTO(cartItem);
     }
 
     @Override
@@ -90,7 +89,7 @@ public class CartItemServiceImpl implements CartItemService {
         cartItem = cartItemRepository.save(cartItem);
         log.info("Updated cart item ID: {} by user ID: {}", cartItem.getId(), userId);
 
-        return cartItemMapper.toDTO(cartItem);
+        return cartItemMapper.toCartItemDTO(cartItem);
     }
 
     @Override

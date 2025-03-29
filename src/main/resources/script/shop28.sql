@@ -129,7 +129,7 @@ CREATE TABLE `cart_items` (
 );
 
 CREATE TABLE `token` (
-  `id` integer PRIMARY KEY NOT NULL,
+  `id` VARCHAR(100) PRIMARY KEY NOT NULL,
   `user_name` varchar(100) NOT NULL,
   `refresh_token` varchar(512) NOT NULL,
   `create_at` datetime,
@@ -163,3 +163,5 @@ ALTER TABLE `feedbacks` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON
 ALTER TABLE `orders` ADD FOREIGN KEY (`address_id`) REFERENCES `addresses` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `products` ADD FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE;
+
+INSERT INTO roles(id, name) values (1, "ADMIN"), (2, "USER");

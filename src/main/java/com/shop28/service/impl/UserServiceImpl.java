@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
 
         List<User> users = userRepository.findAll(page).getContent();
 
-        return users.stream().map(userMapper::toDTO).toList();
+        return users.stream().map(userMapper::toUserDTO).toList();
     }
 
     @Override
@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
         user = userRepository.save(user);
         log.info("Created user ID: {}", user.getId());
 
-        return userMapper.toDTO(user);
+        return userMapper.toUserDTO(user);
     }
 
     @Override
@@ -91,11 +91,6 @@ public class UserServiceImpl implements UserService {
 
         user = userRepository.save(user);
 
-        return userMapper.toDTO(user);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Not found"));
+        return userMapper.toUserDTO(user);
     }
 }

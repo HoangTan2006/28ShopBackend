@@ -3,7 +3,6 @@ package com.shop28.service.impl;
 import com.shop28.dto.request.AuthenticationRequest;
 import com.shop28.dto.response.AuthenticationResponse;
 import com.shop28.dto.response.UserResponse;
-import com.shop28.entity.Token;
 import com.shop28.entity.User;
 import com.shop28.mapper.UserMapper;
 import com.shop28.repository.TokenRepository;
@@ -15,7 +14,6 @@ import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,7 +46,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String accessToken = jwtService.generateToken(user, TypeToken.ACCESS, tokenId);
         String refreshToken = jwtService.generateToken(user, TypeToken.REFRESH, tokenId);
 
-        UserResponse userResponse = userMapper.toDTO(user);
+        UserResponse userResponse = userMapper.toUserDTO(user);
         log.info("User ID: {} authenticated", user.getId());
 
         return AuthenticationResponse.builder()
@@ -74,7 +72,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         log.info("User ID: {} verified the refresh token", user.getId());
 
         return AuthenticationResponse.builder()
-                .userResponse(userMapper.toDTO(user))
+                .userResponse(userMapper.toUserDTO(user))
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();

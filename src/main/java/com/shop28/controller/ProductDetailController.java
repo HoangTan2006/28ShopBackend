@@ -4,6 +4,7 @@ import com.shop28.dto.request.ProductDetailRequest;
 import com.shop28.dto.response.ProductDetailResponse;
 import com.shop28.dto.response.ResponseData;
 import com.shop28.service.ProductDetailService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,7 @@ public class ProductDetailController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{productId}")
     public ResponseEntity<ResponseData<ProductDetailResponse>> createProductDetail(
+            @Valid
             @PathVariable("productId") Integer productId,
             @RequestBody ProductDetailRequest productDetailRequest) {
 

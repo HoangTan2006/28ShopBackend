@@ -1,5 +1,7 @@
 package com.shop28.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shop28.dto.request.ProductRequest;
 import com.shop28.dto.response.ProductResponse;
 import com.shop28.entity.Category;
@@ -14,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,7 +45,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponse> searchProducts(String keyword, Integer pageNumber, Integer pageSize) {
-        return List.of();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        List<Product> products = productRepository.findByNameContaining(keyword, pageable);
+
+        return products.stream().map(productMapper::toProductDTO).toList();
     }
 
     @Override

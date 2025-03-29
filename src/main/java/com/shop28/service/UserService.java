@@ -4,12 +4,13 @@ import com.shop28.dto.request.UserCreateRequest;
 import com.shop28.dto.request.UserUpdateRequest;
 import com.shop28.dto.response.UserResponse;
 import com.shop28.entity.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
 
 public interface UserService {
     User findByUsername(String username);
+
+//    UserResponse SearchUser(String keyword);
 
     List<UserResponse> getUsers(Integer pageNumber);
 

@@ -3,9 +3,8 @@ package com.shop28.controller;
 import com.shop28.dto.request.ProductRequest;
 import com.shop28.dto.response.ProductResponse;
 import com.shop28.dto.response.ResponseData;
-import com.shop28.dto.response.UserResponse;
 import com.shop28.service.ProductService;
-import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -41,9 +39,29 @@ public class ProductController {
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
+    @PostMapping("/search")
+    public ResponseEntity<ResponseData<List<ProductResponse>>> searchProducts(
+            @RequestParam(value = "keyword") String keyword,
+            @RequestParam(value = "pageNumber", defaultValue = "0") Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
+
+        List<ProductResponse> products = productService.searchProducts(keyword, pageNumber, pageSize);
+
+        ResponseData<List<ProductResponse>> responseData = ResponseData.<List<ProductResponse>>builder()
+                .status(HttpStatus.OK.value())
+                .message("Success")
+                .data(products)
+                .build();
+
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<ResponseData<ProductResponse>> createProduct(@RequestBody ProductRequest productRequest) {
+    public ResponseEntity<ResponseData<ProductResponse>> createProduct(
+            @Valid
+            @RequestBody
+            ProductRequest productRequest) {
         ProductResponse product = productService.createProduct(productRequest);
 
         ResponseData<ProductResponse> responseData = ResponseData.<ProductResponse>builder()

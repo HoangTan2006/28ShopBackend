@@ -34,9 +34,9 @@ public class ProductDetailServiceImpl implements ProductDetailService {
     private final ProductDetailMapper productDetailMapper;
 
     @Override
-    public List<ProductDetailResponse> getProductDetailsByProductId(Integer productId, Integer pageNumber, Integer size) {
+    public List<ProductDetailResponse> getProductDetailsByProductId(Integer productId, Integer pageNumber, Integer pageSize) {
 
-        Pageable pageable = PageRequest.of(pageNumber, size);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         List<ProductDetail> productDetails = productDetailRepository.findByProductId(productId, pageable);
 

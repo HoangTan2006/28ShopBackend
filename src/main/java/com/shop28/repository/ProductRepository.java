@@ -14,4 +14,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     @NativeQuery("SELECT * FROM products WHERE category_id = :categoryId " +
                  "LIMIT :limit OFFSET :offset")
     List<Product> findByCategory(Integer categoryId, Integer limit, Integer offset);
+
+    List<Product> findByNameContaining(String keyword, Pageable pageable);
 }

@@ -1,5 +1,6 @@
 package com.shop28.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shop28.dto.request.ProductRequest;
 import com.shop28.dto.response.ProductResponse;
 

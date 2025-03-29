@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: 28shop
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/shop28
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_APPLICATION_NAME: 28ShopBE
+
+
+      JWT_SECRETKEY_ACCESSKEY: VR%^&rv7R%&br67R^BV&%%N&8n8r6Bt8(t78NTBtb78BT8RT75rr6Rv6&nb^rtrvbtbt8(^8rbvvTRv785RV&rv&^R765Btr^v&rb(&rbv67r&F&T&(%79BF^%&vRB
+      JWT_SECRETKEY_REFRESHKEY: BR&^RtVTB^&*vtVBTT*tb8BTVTt76b&*B(nyB&R&*5r5rve4EC$$6vr8TBN&TB*vb btBTV^7GhjGfTYDF568568675F765R&f&f7Rf7f79F&^(fg078F6f6TR^%vT%^7rbr&RB
+      JWT_EXPIRE_ACCESSTOKEN: 3600000
+      JWT_EXPIRE_REFRESHTOKEN: 86400000
+      JWT_ISSUER: admin
+    networks:
+      - 28shop-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: shop28-mysql
+    hostname: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: shop28
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - 28shop-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:latest
+    container_name: shop28-redis
+    hostname: redis
+    restart: always
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    networks:
+      - 28shop-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  mysql_data:
+
+networks:
+  28shop-network:
+    driver: bridge

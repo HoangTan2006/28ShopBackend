@@ -32,7 +32,7 @@ public class User extends AbstractEntity<Integer> implements CustomUserDetails {
     private String email;
 
     @Column(name = "phone")
-    private Integer phone;
+    private String phone;
 
     @Column(name = "is_lock")
     private Boolean isLock;

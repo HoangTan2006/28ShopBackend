@@ -2,9 +2,9 @@ package com.shop28.mapper;
 
 import com.shop28.dto.response.ProductDetailResponse;
 import com.shop28.entity.ProductDetail;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class ProductDetailMapper {
     public ProductDetailResponse toProductDetailDTO(ProductDetail productDetail) {
         return ProductDetailResponse.builder()

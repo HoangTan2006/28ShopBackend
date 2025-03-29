@@ -8,7 +8,7 @@ CREATE TABLE `users` (
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL UNIQUE,
-  `phone` INT NOT NULL,
+  `phone` VARCHAR(11) NOT NULL,
   `is_lock` boolean DEFAULT FALSE,
   `create_at` datetime,
   `update_at` datetime

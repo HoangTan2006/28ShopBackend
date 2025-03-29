@@ -29,10 +29,10 @@ public class JwtServiceImpl implements JwtService {
     @Value("${jwt.expire.refreshToken}")
     private Long REFRESH_EXPIRATION;
 
-    @Value("${jwt.secretKey.accessToken}")
+    @Value("${jwt.secretKey.accessKey}")
     private String ACCESS_KEY;
 
-    @Value("${jwt.secretKey.refreshToken}")
+    @Value("${jwt.secretKey.refreshKey}")
     private String REFRESH_KEY;
 
     @Value("${jwt.issuer}")

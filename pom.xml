@@ -9,8 +9,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.shop28</groupId>
-	<artifactId>Shop28-demo</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>28ShopBE</artifactId>
+	<version>0.0.1</version>
 	<name>Shop28-demo</name>
 	<description>shop28 demo</description>
 	<url/>
@@ -94,6 +94,11 @@
 			<artifactId>mapstruct-processor</artifactId>
 			<version>1.6.3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>

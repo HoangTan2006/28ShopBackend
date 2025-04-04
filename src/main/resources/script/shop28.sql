@@ -1,4 +1,4 @@
-CREATE DATABASE shop28;
+CREATE DATABASE IF NOT EXISTS shop28;
 use shop28;
 
 CREATE TABLE `users` (
@@ -164,4 +164,12 @@ ALTER TABLE `orders` ADD FOREIGN KEY (`address_id`) REFERENCES `addresses` (`id`
 
 ALTER TABLE `products` ADD FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE;
 
-INSERT INTO roles(id, name) values (1, "ADMIN"), (2, "USER");
+INSERT INTO roles(id, name, create_at, update_at) values (1, "ADMIN", NOW(), NOW()), (2, "USER", NOW(), NOW());
+
+--created account admin
+
+INSERT INTO users (first_name, last_name, username, password, email, phone)
+VALUES ('Tấn', 'Lê Hoàng', 'admin', '$2a$10$KK8d3onQJpDWtCJLnnNZxuwm2dyPRvPiOG2SORwAMFoXvj6tOg.Iy', 'admin@gmail.com', '0111111111');
+
+INSERT INTO user_has_role (user_id, role_id, create_at, update_at)
+VALUES (1, 1, NOW(), NOW()), (1, 2, NOW(), NOW());

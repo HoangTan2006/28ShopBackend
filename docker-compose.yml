@@ -40,7 +40,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+#      - mysql_data:/var/lib/mysql
+      - ./src/main/resources/script/shop28.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - 28shop-network
     healthcheck:

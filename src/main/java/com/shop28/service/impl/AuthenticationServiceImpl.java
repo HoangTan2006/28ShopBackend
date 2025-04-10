@@ -40,7 +40,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
 
-        User user = userService.findByUsername(authenticationRequest.getUsername());
+        User user = (User) authentication.getPrincipal();
 
         String tokenId = UUID.randomUUID().toString();
         String accessToken = jwtService.generateToken(user, TypeToken.ACCESS, tokenId);
@@ -58,8 +58,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse verifyRefreshToken(String refreshToken) {
-        if (StringUtils.isBlank(refreshToken)) throw new RuntimeException("token must not be blank");
         //Xác thực refresh token
+        if (StringUtils.isBlank(refreshToken)) throw new RuntimeException("token must not be blank");
         Claims extractToken = jwtService.verifyToken(refreshToken, TypeToken.REFRESH);
         String username = extractToken.getSubject();
 

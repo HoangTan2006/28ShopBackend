@@ -1,6 +1,7 @@
 package com.shop28.service.impl;
 
 import com.shop28.dto.request.SizeRequest;
+import com.shop28.dto.response.ColorResponse;
 import com.shop28.dto.response.SizeResponse;
 import com.shop28.entity.Size;
 import com.shop28.repository.SizeRepository;
@@ -18,23 +19,14 @@ public class SizeServiceImpl implements SizeService {
 
     @Override
     public List<SizeResponse> getSizes() {
-        return sizeRepository.findAll().stream().map(size -> SizeResponse.builder()
-                .id(size.getId())
-                .name(size.getName())
-                .build()).toList();
+        List<Size> sizes = sizeRepository.findAll();
+        return sizes.stream().map(size -> new SizeResponse(size.getId(), size.getName())).toList();
     }
 
     @Override
     public SizeResponse createSize(SizeRequest sizeRequest) {
-        Size size = Size.builder()
-                .name(sizeRequest.getName().toUpperCase())
-                .build();
+        Size size = sizeRepository.save(new Size(sizeRequest.getName().toUpperCase()));
 
-        size = sizeRepository.save(size);
-
-        return SizeResponse.builder()
-                .id(size.getId())
-                .name(size.getName())
-                .build();
+        return new SizeResponse(size.getId(), size.getName());
     }
 }

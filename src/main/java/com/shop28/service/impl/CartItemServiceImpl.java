@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,10 +42,7 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     @CacheEvict(cacheNames = "cart", key = "#userId")
-    public CartItemResponse createCartItem(Integer userId, CartItemRequest cartItemRequest) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+    public CartItemResponse createCartItem(UserDetails user, CartItemRequest cartItemRequest) {
 
         ProductDetail productDetail = productDetailRepository.findById(cartItemRequest.getProductDetailId())
                 .orElseThrow(() -> new EntityNotFoundException("Product detail not found"));
@@ -54,14 +52,14 @@ public class CartItemServiceImpl implements CartItemService {
             throw new RuntimeException("The product" + productDetail.getProduct().getName() + "is out of stock");
 
         CartItem cartItem = CartItem.builder()
-                .user(user)
+                .user((User) user)
                 .productDetail(productDetail)
                 .quantity(cartItemRequest.getQuantity())
                 .price(productDetail.getPrice() * cartItemRequest.getQuantity())
                 .build();
 
         cartItem = cartItemRepository.save(cartItem);
-        log.info("Created cart item ID: {} by user ID: {}", cartItem.getId(), userId);
+        log.info("Created cart item ID: {} by user ID: {}", cartItem.getId(), user.getUsername());
 
         return cartItemMapper.toCartItemDTO(cartItem);
     }
@@ -102,6 +100,6 @@ public class CartItemServiceImpl implements CartItemService {
         if (!cartItem.getUser().getId().equals(userId)) throw new RuntimeException("Cannot be deleted");
 
         cartItemRepository.deleteById(cartItemId);
-        log.info("Deleted cart item ID: {}", cartItemId);
+        log.info("Deleted cart item ID: {} by User ID: {}", cartItemId, userId);
     }
 }

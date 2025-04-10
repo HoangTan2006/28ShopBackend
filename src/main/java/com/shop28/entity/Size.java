@@ -22,4 +22,8 @@ public class Size extends AbstractEntity<Integer> {
 
     @OneToMany(mappedBy = "size")
     private Set<ProductDetail> productDetails = new HashSet<>();
+
+    public Size(String name) {
+        this.name = name;
+    }
 }

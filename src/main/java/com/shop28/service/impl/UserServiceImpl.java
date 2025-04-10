@@ -34,7 +34,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
-    private final EntityManager entityManager;
     private final UserMapper userMapper;
 
     @Override

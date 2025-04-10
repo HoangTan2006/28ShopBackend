@@ -22,25 +22,16 @@ public class ColorServiceImpl implements ColorService {
     public List<ColorResponse> getColors() {
         List<Color> colors = colorRepository.findAll();
 
-        return colors.stream().map(color -> ColorResponse.builder()
-                .id(color.getId())
-                .name(color.getName())
-                .build()).toList();
+        return colors.stream().map(
+                color -> new ColorResponse(color.getId(), color.getName())).toList();
     }
 
     @Override
     public ColorResponse createColor(ColorRequest colorRequest) {
 
-        Color color = Color.builder()
-                .name(colorRequest.getName().toUpperCase())
-                .build();
-
-        color = colorRepository.save(color);
+        Color color = colorRepository.save(new Color(colorRequest.getName().toUpperCase()));
         log.info("Created color \" {} \" by Admin", color.getName());
 
-        return ColorResponse.builder()
-                .id(color.getId())
-                .name(color.getName())
-                .build();
+        return new ColorResponse(color.getId(), color.getName());
     }
 }

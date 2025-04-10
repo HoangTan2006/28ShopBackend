@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -68,21 +69,18 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse createOrder(Integer userId, AddressRequest addressRequest) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+    public OrderResponse createOrder(UserDetails user, AddressRequest addressRequest) {
 
         Address address = addressRepository.save(addressMapper.toEntity(addressRequest));
 
         //Tạo order
         Order order = Order.builder()
-                .user(user)
+                .user((User) user)
                 .status(TypeStatus.PENDING.name())
                 .address(address)
                 .build();
 
-        List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
+        List<CartItem> cartItems = cartItemRepository.findByUserId(((User) user).getId());
 
         List<Integer> productDetailsId = cartItems.stream().map(cartItem ->
                 cartItem.getProductDetail().getId()).toList();
@@ -136,7 +134,7 @@ public class OrderServiceImpl implements OrderService {
         cartItemRepository.deleteAll(cartItems);
         order = orderRepository.save(order);
         if (true) throw new RuntimeException("test");
-        log.info("Created order ID: {} by user ID: {}", order.getId(), user.getId());
+        log.info("Created order ID: {} by user name: {}", order.getId(), user.getUsername());
 
         return OrderResponse.builder()
                 .id(order.getId())

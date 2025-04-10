@@ -71,7 +71,7 @@ public class OrderController {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        OrderResponse order = orderService.createOrder(userDetails.getId(), addressRequest);
+        OrderResponse order = orderService.createOrder(userDetails, addressRequest);
 
         ResponseData<OrderResponse> responseData = ResponseData.<OrderResponse>builder()
                 .status(HttpStatus.CREATED.value())

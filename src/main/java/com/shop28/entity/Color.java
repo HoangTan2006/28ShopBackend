@@ -22,4 +22,8 @@ public class Color extends AbstractEntity<Integer> {
 
     @OneToMany(mappedBy = "color")
     private Set<ProductDetail> productDetails = new HashSet<>();
+
+    public Color(String name) {
+        this.name = name;
+    }
 }

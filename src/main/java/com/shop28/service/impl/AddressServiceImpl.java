@@ -21,10 +21,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public AddressResponse createAddress(AddressRequest addressRequest) {
 
-        Address address = addressMapper.toEntity(addressRequest);
-
-        address = addressRepository.save(address);
-
+        Address address = addressRepository.save(addressMapper.toEntity(addressRequest));
         return addressMapper.toAddressDTO(address);
     }
 
